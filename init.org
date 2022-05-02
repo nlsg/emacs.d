@@ -1,0 +1,509 @@
+#+TITLE: Emacs Config
+#+AUTHOR: nls
+#+STARTUP: overview
+#+PROPERTY: header-args :cache yes :tangle ~/.emacs.d/init.el :mkdirp yes :padline no :async
+
+* MELPA
+  MELPA is the defacto standard package manager for emacs. This snippet was taken from [[https://melpa.org/#/getting-started][The MELPA Website]].
+
+#+BEGIN_SRC elisp
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+#+END_SRC
+#+RESULTS[e9d5242741a5c0a2659e131c65b10e2e22a4c533]:
+: ((melpa . https://melpa.org/packages/) (elpa . https://elpa.gnu.org/packages/))
+
+* selected-packages
+This will install all the packages I want/need on a fresh emacs install.
+Source comes from: [[https://stackoverflow.com/a/31080940]]
+
+** packages
+#+BEGIN_SRC elisp
+  (setq package-list
+      '(paredit ;; or personal preference. parinfer is also good
+	cider
+	clojure-mode
+	nord-theme
+	async
+	ob-async
+	ob-clojurescript
+	org-babel-eval-in-repl
+	eval-in-repl))
+
+  ; activate all the packages
+  (package-initialize)
+
+  ; fetch the list of packages available 
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  ; install the missing packages
+  (dolist (package package-list)
+    (unless (package-installed-p package)
+      (package-install package)))
+
+#+END_SRC
+#+RESULTS[e8ebc565ff9485ce9d04c211df818bd6149d1922]:
+
+** use-pack
+#+BEGIN_SRC elisp
+;;; BOOTSTRAP USE-PACKAGE
+(setq use-package-always-ensure t)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile (require 'use-package))
+#+END_SRC
+
+* evil
+#+BEGIN_SRC elisp
+;;; UNDO
+;; Vim style undo not needed for emacs 28
+(use-package undo-fu)
+
+;;; Vim Bindings
+(use-package evil
+  :demand t
+  :bind (("<escape>" . keyboard-escape-quit))
+  :init
+  ;; allows for using cgn
+  ;; (setq evil-search-module 'evil-search)
+  (setq evil-want-keybinding nil)
+  ;; no vim insert bindings
+  (setq evil-undo-system 'undo-fu)
+  :config
+  (evil-mode 1))
+
+;;; Vim Bindings Everywhere else
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-want-integration t)
+  (evil-collection-init))
+
+
+
+
+
+
+
+#+END_SRC 
+#+RESULTS[2e8f35d0b930d397d02203d6dc4dc18c26177b0b]:
+: 4
+
+* global-setting
+** Backups, Autosaves, Locks
+Backup files I find to be more frustrating than not, so I disable them globally.
+The obvious risk here is that crashes cause files to be lost. 
+It's possible, of course, but I do find that frequent saving paired with good version control (and remote repos, syncing, and redundant copying) will suit me just fine.
+Then I never have weird file names cluttering up my folders.
+
+#+begin_src elisp
+(setq make-backup-files nil) ; stop creating backup~ files
+(setq auto-save-default nil) ; stop creating #autosave# files
+(setq create-lockfiles nil) ; no lockfiles
+
+#+end_src
+
+#+RESULTS[70c376fce4f9f608913ef0582c5d2f41539ad18f]:
+
+** General Global Settings
+Changing a few things around to make emacs feel and act more like I want it to.
+The auto-revert setting is enabled because tangle / detangle for literate programming will change contents of files.
+If the file is open in a buffer, I want it to automatically show the change without asking me every time.
+
+#+BEGIN_SRC elisp
+    (global-set-key (kbd "C-s") 'save-buffer)
+    (global-set-key (kbd "C-S-s") 'write-file)
+    (global-auto-revert-mode t)
+    (tool-bar-mode 0)
+    (scroll-bar-mode 0)
+    (cua-mode 1)
+    ;; path stuff for macOS
+    (add-to-list 'exec-path "/usr/local/bin")
+
+#+END_SRC
+
+#+RESULTS[5ac3972033b408dc44acfce821d7009cdb63f7bc]:
+| /usr/local/sbin | /usr/local/bin | /usr/bin | /usr/lib/jvm/default/bin | /usr/bin/site_perl | /usr/bin/vendor_perl | /usr/bin/core_perl | /var/lib/snapd/snap/bin | /home/nls/tools/node-v14.15.4-linux-x64/bin | /home/nls/.local/bin | /home/nls/.bin | /usr/local/sbin | /usr/local/bin | /usr/bin | /usr/bin/site_perl | /usr/bin/vendor_perl | /usr/bin/core_perl | /var/lib/snapd/snap/bin | /home/nls/cpp/ | /home/nls/py/pytools | /home/nls/py/cnav | /home/nls/.fzf/bin | /home/nls/sys_cfg | /home/nls/py/lib | /usr/lib/emacs/27.2/x86_64-pc-linux-gnu |
+
+Set Up Good Defaults. Taken from [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][here]]
+
+#+begin_src elisp
+;; (set-frame-font "Menlo 15" nil t)
+(load-theme 'nord t)
+
+(setq-default
+ ad-redefinition-action 'accept                   ; Silence warnings for redefinition
+ auto-window-vscroll nil                          ; Lighten vertical scroll
+ confirm-kill-emacs 'yes-or-no-p                  ; Confirm before exiting Emacs
+ display-time-default-load-average nil            ; Don't display load average
+ display-time-mode 0                              ; Display time in frames
+ display-time-format "%H:%M"                      ; Format the time string
+ fill-column 80                                   ; Set width for automatic line breaks
+ scroll-bar-mode nil
+ display-line-numbers-type nil
+ help-window-select t                             ; Focus new help windows when opened
+ indent-tabs-mode nil                             ; Stop using tabs to indent
+ inhibit-startup-screen t                         ; Disable start-up screen
+ initial-scratch-message ""                       ; Empty the initial *scratch* buffer
+ left-margin-width 1 right-margin-width 1         ; Add left and right margins
+ mouse-yank-at-point t                            ; Yank at point rather than pointer
+ ns-use-srgb-colorspace nil                       ; Don't use sRGB colors
+ select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
+ sentence-end-double-space nil                    ; End a sentence after a dot and a space
+ show-trailing-whitespace nil                     ; Display trailing whitespaces
+ split-height-threshold nil                       ; Disable vertical window splitting
+ split-width-threshold 1                          ; Disable horizontal window splitting
+ tab-width 4                                      ; Set width for tabs
+ uniquify-buffer-name-style 'forward              ; Uniquify buffer names
+ window-combination-resize t                      ; Resize windows proportionally
+ x-stretch-cursor t                               ; Stretch cursor to the glyph width
+ scroll-step 1
+ scroll-conservatively 10000)
+
+(delete-selection-mode 1)                         ; Replace region when inserting text
+(display-time-mode 0)                             ; Enable time in the mode-line
+(fset 'yes-or-no-p 'y-or-n-p)                     ; Replace yes/no prompts with y/n
+(menu-bar-mode 0)                                 ; Disable the menu bar
+(put 'downcase-region 'disabled nil)              ; Enable downcase-region
+(put 'upcase-region 'disabled nil)                ; Enable upcase-region
+(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+
+#+end_src
+
+Apparently Garbage Collecting when out of focus can make emacs feel faster. I'll try that.
+
+#+begin_src elisp
+  (add-hook 'focus-out-hook #'garbage-collect)
+
+#+end_src
+
+#+RESULTS[fa1d73674c306882088317f09677e78c8fc2f746]:
+| garbage-collect |
+
+** custom
+#+BEGIN_SRC elisp
+(vertico-mode)
+#+END_SRC
+* dev-settings
+I mostly use Clojure and Clojurescript, so they're the envs I set up.
+
+** Clojure
+Editing Clojure / Clojurescript code is best done using a REPL, which is provided with the cider package.
+Cider has a lot of options to customize, and here are the ones I think are most critical.
+
+You could also use inf-clojure for a simpler REPL experience.
+I don't use it so can't actually speak to its utility, but I know many clojure experts prefer its simplicity, so consider that if CIDER overwhelms you a bit.
+
+#+BEGIN_SRC elisp
+(setq nrepl-hide-special-buffers t
+      cider-repl-clear-help-banner t
+      cider-font-lock-dynamically nil
+      cider-popup-stacktraces nil
+      cider-repl-popup-stacktraces t
+      cider-repl-use-pretty-printing t
+      cider-repl-pop-to-buffer-on-connect t
+      cider-repl-display-help-banner nil)
+
+;; Allow cider-repl to be cleared with shortcut
+(add-hook 'cider-repl-mode-hook
+      '(lambda () (define-key cider-repl-mode-map (kbd "C-c M-b")
+            'cider-repl-clear-buffer)))
+
+(add-hook 'clojure-mode-hook #'cider-mode)
+
+(add-hook 'cider-mode-hook (lambda () (show-paren-mode 1)))
+(add-hook 'cider-mode-hook #'eldoc-mode)
+(add-hook 'cider-mode-hook #'enable-paredit-mode)
+(add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
+(add-hook 'cider-mode-hook #'imenu-add-menubar-index)
+
+#+END_SRC
+
+** Clojurescript
+#+BEGIN_SRC elisp
+(add-hook 'clojurescript-mode #'enable-paredit-mode)
+
+#+END_SRC
+
+* literate-programming
+Literate programming enables contextual, 'justified' programming.
+It encourages programmers to write the /why/ of their programming decisions while simultaneously writing the code.
+It's an exciting paradigm. In fact, it's even exhibited here in this org file. Prose and code intertwined.
+
+To be completely honest, I am not consistently perfect at the *ideal* literate programming style,
+but I really do love doing all of my programming, planning, and task tracking for each project in a single .
+
+org file. It's not for everyone, but the flow works for me.
+
+** org-mode-settings
+#+BEGIN_SRC elisp
+(require 'org)
+(add-to-list 'org-modules 'org-tempo)
+(setq org-startup-folded nil
+      org-hide-emphasis-markers nil
+      org-edit-src-content-indentation 0
+      org-src-tab-acts-natively t
+      org-src-fontify-natively t
+      org-confirm-babel-evaluate nil
+      org-support-shift-select 'always)
+
+(add-hook 'org-mode-hook 'show-paren-mode)
+(add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+
+#+END_SRC
+
+Trying to fix weird org syntax problems.
+This just lets Org ignore < and > characters as if they were regular words.
+This is necessary because in Clojure I want to make functions with -> in the name and Org was always insisting on pairing <>.
+This caused any other paren matching to stop working. It sucked.
+
+** angle-bracket-hack
+#+begin_src elisp
+(defun my-angle-bracket-fix ()
+  (modify-syntax-entry ?< "w")
+  (modify-syntax-entry ?> "w"))
+
+(add-hook 'org-mode-hook 'my-angle-bracket-fix)
+#+end_src
+
+** paredit-in-code-block
+This block will activate paredit-mode when in an org-mode src file. Obvious weaknesses:
+ - checks post-command, which occurs a lot. Could become a problem.
+ - Does not check the block's language. Paredit may not be desireable in other langs.
+ - does break if you have unbalenced parens anywhere in the org file. Don't yet have a solution for that.
+
+Alternatively, poly-mode might be useful here. In my experiments though, it proved to be a bit too clunky for my tastes and it interfered with a few things like M-s splitting code blocks.
+
+#+begin_src elisp
+(defun my-paredit-in-code-block ()
+  (interactive)
+  (when (derived-mode-p 'org-mode)
+    (unless (window-minibuffer-p)
+      (if (org-babel-when-in-src-block)
+          (paredit-mode 1)
+        (paredit-mode 0)))))
+
+(add-hook 'post-command-hook #'my-paredit-in-code-block)
+
+#+end_src
+
+It's extremely useful to split code blocks to quickly add org-mode text between the src. The default binding is C-c C-v C-d, which is somewhat annoying. I think M-s in org-mode should do the trick.
+
+#+BEGIN_SRC elisp
+;; Split Org Block using M-s
+(define-key org-mode-map (kbd "M-s") 'org-babel-demarcate-block)
+
+;; toggle paredit mode manually
+(define-key org-mode-map (kbd "M-P") 'paredit-mode)
+
+#+END_SRC
+
+Remove the function which causes text to pop around when pressing tab. This is annoying and confusing.
+
+#+BEGIN_SRC elisp
+(remove-hook 'org-cycle-hook
+             'org-optimize-window-after-visibility-change)
+
+#+END_SRC
+
+** org-babel-settings
+Org Babel is used for evaluating code blocks inside org files.
+We set some languages to load in for possible evaluation.
+
+#+BEGIN_SRC elisp
+(eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((clojure . t)
+     (clojurescript . t)
+     (emacs-lisp . t)
+     (shell . t))))
+
+#+END_SRC
+
+** codeblock-backends
+Some backends for code execution need to be set.
+
+#+BEGIN_SRC elisp
+(setq org-babel-clojure-backend 'cider
+      org-babel-clojure-sync-nrepl-timeout nil)
+
+#+END_SRC
+
+The clojure babel backend is nice, except it injects a namespace form at the top of every tangled code block. I don't know why, but I don't need that. To fix the issue, redefine the expand-body function from ob-clojure eliminating the ns string.
+
+I don't know if this is still necessary. Maybe test without it?
+
+#+begin_src elisp
+(defun org-babel-expand-body:clojure (body params)
+  "Expand BODY according to PARAMS, return the expanded body."
+  (let* ((vars (org-babel--get-vars params))
+         (ns (or (cdr (assq :ns params))
+                 (org-babel-clojure-cider-current-ns)))
+         (result-params (cdr (assq :result-params params)))
+         (print-level nil)
+         (print-length nil)
+         (body
+          (org-trim
+           (format "%s"
+                   ;; Variables binding.
+                   (if (null vars) (org-trim body)
+                     (format "(let [%s]\n%s)"
+                             (mapconcat
+                              (lambda (var)
+                                (format "%S (quote %S)" (car var) (cdr var)))
+                              vars
+                              "\n      ")
+                             body))))))
+    (if (or (member "code" result-params)
+            (member "pp" result-params))
+        (format "(clojure.pprint/pprint (do %s))" body)
+      body)))
+
+#+end_src
+
+Add the ability to evaluate code blocks in Org files in the proper REPL window.
+
+#+begin_src elisp
+;; Sets M-<return> to evaluate code blocks in the REPL
+(defun org-meta-return-around (org-fun &rest args)
+  "Run `ober-eval-in-repl' if in source code block,
+  `ober-eval-block-in-repl' if at header,
+  and `org-meta-return' otherwise."
+    (if (org-in-block-p '("src"))
+        (let* ((point (point))
+               (element (org-element-at-point))
+               (area (org-src--contents-area element))
+               (beg (copy-marker (nth 0 area))))
+          (if (< point beg)
+              (ober-eval-block-in-repl)
+            (ober-eval-in-repl)))
+      (apply org-fun args)))
+
+(advice-add 'org-meta-return :around #'org-meta-return-around)
+
+;; Prevent eval in repl from moving cursor to the REPL
+(with-eval-after-load "eval-in-repl"
+  (setq eir-jump-after-eval nil))
+
+#+end_src
+
+** literate-programming-util-fns
+Tangling can be set to occur automatically on save. This makes things way simpler.
+Additionally, we set up todos to be moved to the agenda on save. This is just to keep things organized if todos are added to project org files. Once again, this is a good feature that I underutilize due to... how I am as a person, I guess??
+
+Tangle on save only occurs if the buffer being saved is an Org-Mode file.
+
+#+BEGIN_SRC elisp
+(defun org-babel-clojure-cider-current-ns ())
+
+(defun tangle-on-save-org-mode-file ()
+  (when (and (string-match-p
+              (regexp-quote ".org") (message "%s" (current-buffer)))
+             (not (string-match-p
+                   (regexp-quote "[") (message "%s" (current-buffer)))))
+    (org-babel-tangle)))
+
+(add-hook 'after-save-hook 'tangle-on-save-org-mode-file)
+
+(defun to-agenda-on-save-org-mode-file ()
+  (when (string= (message "%s" major-mode) "org-mode")
+    (org-agenda-file-to-front)))
+
+(add-hook 'after-save-hook 'to-agenda-on-save-org-mode-file)
+
+#+END_SRC
+
+** buffer-revert
+When a file is modified externally, emacs does not show this change by default. Instead, when you try to edit it will ask you to modify or revert. Since Tangling files changes src code automatically, it is more effective to automatically revert any buffers which have src files open. 
+
+#+BEGIN_SRC elisp
+(defun revert-all-buffers ()
+  "Refreshes all open buffers from their respective files."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and (buffer-file-name)
+		 (file-exists-p (buffer-file-name))
+		 (not (buffer-modified-p)))
+	(revert-buffer t t t) )))
+  (message "Refreshed open files."))
+(add-hook 'after-save-hook 'revert-all-buffers)
+
+#+END_SRC
+
+** faster tangling
+The following code is from:
+
+[[https://www.wisdomandwonder.com/article/10630/how-fast-can-you-tangle-in-org-mode]]
+
+It basically boils down to adjusting garbage collection settings at key times during an org file save. Not strictly necessary, but nice to have.
+
+#+BEGIN_SRC elisp
+(setq help/default-gc-cons-threshold gc-cons-threshold)
+(defun help/set-gc-cons-threshold (&optional multiplier notify)
+  "Set `gc-cons-threshold' either to its default value or a
+   `multiplier' thereof."
+  (let* ((new-multiplier (or multiplier 1))
+         (new-threshold (* help/default-gc-cons-threshold
+                           new-multiplier)))
+    (setq gc-cons-threshold new-threshold)
+    (when notify (message "Setting `gc-cons-threshold' to %s"
+                          new-threshold))))
+(defun help/double-gc-cons-threshold () "Double `gc-cons-threshold'." (help/set-gc-cons-threshold 2))
+(add-hook 'org-babel-pre-tangle-hook #'help/double-gc-cons-threshold)
+(add-hook 'org-babel-post-tangle-hook #'help/set-gc-cons-threshold)
+
+#+END_SRC
+
+* templates
+Insertion templates can be used to speed up project setups. This is code of my own creation, so use at your own risk. The template files are in ~.emacs.d/templates/lib.org~.
+
+** slurp
+#+BEGIN_SRC elisp
+(defun slurp (file)
+  (with-temp-buffer
+    (insert-file-contents file)
+    (buffer-substring-no-properties
+     (point-min)
+     (point-max))))
+
+#+END_SRC
+
+** template-reader
+#+begin_src elisp
+(defun template-reader (file replace)
+  (let ((lines (split-string (slurp file) "\n")))
+    (->> lines
+         (mapcar (lambda (x) (replace-regexp-in-string "_str_" replace x)))
+         (mapcar (lambda (x) (concat x "\n")))
+         (-concat)
+         (apply 'concat))))
+
+#+end_src
+
+** clj-org-templates
+I use org mode and literate programming ideas to build my clj/cljs projects. So, it is helpful to have skeletons that take .org template files that tangle into a nice clojure project setup. Currently I only have one template, but the idea is to be able to have a few which you just bind to different keys as needed. The idea is demonstrated with 'Project' and 'Library'.
+
+#+BEGIN_SRC elisp
+(define-skeleton cljc-lib-skeleton
+  "Inserts a .org template with user's project name input. 
+   Use in empty file and save to desired project directory.
+   Tangle will create project structure on save."
+  ""
+  (template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Library name: ")))
+
+(define-skeleton cljc-project-skeleton
+  "Inserts a .org template with user's project name input. 
+   Use in empty file and save to desired project directory.
+   Tangle will create project structure on save."
+  ""
+  (template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Project name: ")))
+
+(global-set-key (kbd "C-S-L") 'cljc-lib-skeleton)
+(global-set-key (kbd "C-S-P") 'cljc-project-skeleton)
+
+#+END_SRC
