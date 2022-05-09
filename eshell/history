@@ -1,0 +1,11 @@
+neofetch
+ls
+cd ~
+echo $TERM
+echo $TERM
+TERM=duu
+echo $TERM
+export TERM=duu5D
+echo $TERM
+export TERM=xterm-24bit
++ 12 23

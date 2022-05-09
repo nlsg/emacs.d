@@ -1,0 +1,69 @@
+;;; -*- coding: utf-8 -*-
+(("/home/nls/clj/ndb/"
+	(dired-filename . "/home/nls/clj/ndb/src"))
+ ("/home/nls/clj/ndb/src/"
+	(dired-filename . "/home/nls/clj/ndb/src/cljs"))
+ ("/home/nls/clj/ndb/src/cljs/"
+	(dired-filename . "/home/nls/clj/ndb/src/cljs/ndb"))
+ ("/home/nls/clj/ndb/src/cljs/ndb/"
+	(dired-filename . "/home/nls/clj/ndb/src/cljs/ndb/core.cljs"))
+ ("/home/nls/clj/ndb/src/cljs/ndb/core.cljs" . 597)
+ ("/home/nls/hy/dashboard/"
+	(dired-filename . "/home/nls/hy/dashboard/.."))
+ ("/home/nls/hy/"
+	(dired-filename . "/home/nls/hy/hytry.hy"))
+ ("/home/nls/hy/hytry.hy" . 1087)
+ ("/home/nls/base.org" . 665)
+ ("/home/nls/.emacs.d/init.org" . 7977)
+ ("/home/nls/.emacs.d/init.el" . 5794)
+ ("/home/nls/.emacs.d/elpa/jsonrpc-1.0.15/jsonrpc-autoloads.el" . 470)
+ ("/home/nls/.emacs.d/elpa/flymake-1.2.2/flymake-autoloads.el" . 4126)
+ ("/home/nls/.emacs.d/elpa/project-0.8.1/project-autoloads.el" . 9081)
+ ("/home/nls/.emacs.d/elpa/xref-1.4.1/xref-autoloads.el" . 4419)
+ ("/home/nls/.emacs.d/elpa/eldoc-1.11.1/eldoc-autoloads.el" . 2302)
+ ("/home/nls/clj/todo/"
+	(dired-filename . "/home/nls/clj/todo/.lein-env"))
+ ("/home/nls/clj/ndb/src/clj/"
+	(dired-filename . "/home/nls/clj/ndb/src/clj/ndb"))
+ ("/home/nls/clj/ndb/src/clj/ndb/"
+	(dired-filename . "/home/nls/clj/ndb/src/clj/ndb/handler.clj"))
+ ("/home/nls/clj/ndb/src/clj/ndb/handler.clj" . 1042)
+ ("/home/nls/clj/todo/src/cljs/todo/"
+	(dired-filename . "/home/nls/clj/todo/src/cljs/todo/.."))
+ ("/home/nls/clj/todo/src/cljc/todo/util.cljc" . 101)
+ ("/home/nls/clj/todo/src/clj/todo/server.clj" . 43)
+ ("/home/nls/clj/todo/src/clj/todo/handler.clj" . 952)
+ ("/home/nls/clj/todo/src/cljs/todo/core.cljs" . 1662)
+ ("/home/nls/.config/termite/config" . 1721)
+ ("/usr/share/emacs/27.2/etc/COPYING" . 30778)
+ ("/home/nls/.emacs.d/elpa/solarized-theme-20220324.445/solarized-theme-autoloads.el" . 5909)
+ ("/home/nls/.emacs.d/elpa/monokai-theme-20220117.1244/monokai-theme-autoloads.el" . 595)
+ ("/home/nls/sys_cfg/shellrc" . 823)
+ ("/home/nls/sys_cfg/startup.sh" . 200)
+ ("/home/nls/.emacs.d/"
+	(dired-filename . "/home/nls/.emacs.d/srecode-map.el"))
+ ("/home/nls/hy/dashboard/dashboard.hy" . 357)
+ ("/home/nls/clj/todo/resources/"
+	(dired-filename . "/home/nls/clj/todo/resources/public"))
+ ("/home/nls/clj/todo/resources/public/"
+	(dired-filename . "/home/nls/clj/todo/resources/public/css"))
+ ("/home/nls/clj/todo/resources/public/css/"
+	(dired-filename . "/home/nls/clj/todo/resources/public/css/site.css"))
+ ("/home/nls/clj/todo/resources/public/css/site.css" . 449)
+ ("/home/nls/.emacs.d/url/cookies" . 231)
+ ("/home/nls/.emacs.d/elpa/hy-mode-20211016.2011/hy-mode-autoloads.el" . 2007)
+ ("/home/nls/.emacs.d/elpa/s-20210616.619/s-autoloads.el" . 368)
+ ("/home/nls/sys_cfg/"
+	(dired-filename . "/home/nls/sys_cfg/startup.sh"))
+ ("/home/nls/.emacs.d/elpa/evil-leader-20140606.1243/evil-leader.el" . 4584)
+ ("/home/nls/clj/todo/src/clj/"
+	(dired-filename . "/home/nls/clj/todo/src/clj/todo"))
+ ("/home/nls/.emacs.d/push.ini" . 111)
+ ("/home/nls/clj/"
+	(dired-filename . "/home/nls/clj/tst.clj"))
+ ("/home/nls/.emacs.d/elpa/clojure-mode-20220418.2015/clojure-mode.el" . 23967)
+ ("/home/nls/clj/tst.clj" . 59)
+ ("/home/nls/clj/todo/src/clj/todo/"
+	(dired-filename . "/home/nls/clj/todo/src/clj/todo/handler.clj"))
+ ("/home/nls/.emacs.d/elpa/evil-leader-20140606.1243/evil-leader-autoloads.el" . 1608)
+ ("/usr/share/emacs/27.2/lisp/org/org.el.gz" . 188372))

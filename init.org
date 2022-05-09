@@ -3,8 +3,9 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :cache yes :tangle ~/.emacs.d/init.el :mkdirp yes :padline no :async
 
-* MELPA
-  MELPA is the defacto standard package manager for emacs. This snippet was taken from [[https://melpa.org/#/getting-started][The MELPA Website]].
+
+* MELPA / pkgs
+[[https://melpa.org/#/getting-started][MELPA]], the defacto standard package manager for emacs
 
 #+BEGIN_SRC elisp
 (require 'package)
@@ -14,41 +15,36 @@
 #+RESULTS[e9d5242741a5c0a2659e131c65b10e2e22a4c533]:
 : ((melpa . https://melpa.org/packages/) (elpa . https://elpa.gnu.org/packages/))
 
-* selected-packages
-This will install all the packages I want/need on a fresh emacs install.
-Source comes from: [[https://stackoverflow.com/a/31080940]]
-
 ** packages
 #+BEGIN_SRC elisp
-  (setq package-list
-      '(paredit ;; or personal preference. parinfer is also good
-	cider
-	clojure-mode
-	nord-theme
-	async
-	ob-async
-	ob-clojurescript
-	org-babel-eval-in-repl
-	eval-in-repl))
+(setq package-list
+'(paredit ;; or personal preference. parinfer is also good
+		cider
+		clojure-mode
+		nord-theme
+		async
+		ob-async
+		ob-clojurescript
+		org-babel-eval-in-repl
+		eval-in-repl))
 
-  ; activate all the packages
-  (package-initialize)
+; activate all the packages
+(package-initialize)
 
-  ; fetch the list of packages available 
-  (unless package-archive-contents
-    (package-refresh-contents))
+; fetch the list of packages available 
+(unless package-archive-contents
+(package-refresh-contents))
 
-  ; install the missing packages
-  (dolist (package package-list)
-    (unless (package-installed-p package)
-      (package-install package)))
+; install the missing packages
+(dolist (package package-list)
+(unless (package-installed-p package)
+		(package-install package)))
 
 #+END_SRC
-#+RESULTS[e8ebc565ff9485ce9d04c211df818bd6149d1922]:
+#+RESULTS[bd778cd04e227fee06eec20623a92be1b73072dd]:
 
-** use-pack
+** bootstrap use-package
 #+BEGIN_SRC elisp
-;;; BOOTSTRAP USE-PACKAGE
 (setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -56,85 +52,102 @@ Source comes from: [[https://stackoverflow.com/a/31080940]]
 (eval-when-compile (require 'use-package))
 #+END_SRC
 
+#+RESULTS[892ddbca7d1f646a522d1f6d6e5674ec11c7d720]:
+: use-package
+
+
 * evil
+    #+BEGIN_SRC elisp
+		(use-package undo-fu) ;; Vim style undo not needed for emacs 28
+
+		(global-evil-leader-mode 1)
+		(evil-leader/set-leader "<SPC>")
+
+		(evil-leader/set-key
+			"h" 'evil-window-left
+			"j" 'evil-window-down
+			"k" 'evil-window-up
+			"l" 'evil-window-right
+
+			"q" 'evil-window-delete
+			"f" 'find-file
+			"<SPC>" 'execute-extended-command
+			"<RET>" 'org-open-at-point
+
+			"H" 'evil-window-move-far-left
+			"J" 'evil-window-move-very-bottom
+			"K" 'evil-window-move-very-top
+			"L" 'evil-window-move-far-right
+
+			"w" 'save-buffer
+			"b" 'switch-to-buffer
+			"d" 'kill-buffer)
+
+
+		(define-key evil-normal-state-map (kbd "U") 'evil-redo)
+		(define-key evil-normal-state-map (kbd "J") 'scroll-up-line)
+		(define-key evil-normal-state-map (kbd "K") 'scroll-down-line)
+
+		(use-package evil
+			:demand t
+			:bind (("<escape>" . keyboard-escape-quit))
+			:init
+			(setq evil-wantintegration t
+				evil-search-module 'evil-search
+				evil-want-keybinding nil
+				evil-undo-system 'undo-fu)
+			:config
+			(evil-mode 1))
+
+		;;; Vim Bindings Everywhere else
+		(use-package evil-collection
+			:after evil
+			:config
+			(setq evil-want-integration t)
+			(evil-collection-init))
+
+    #+END_SRC 
+		#+RESULTS[4a2d18a086afe108bcadf6c58f94f08a87354d2c]:
+		: t
+
+
+* set-modes
 #+BEGIN_SRC elisp
-;;; UNDO
-;; Vim style undo not needed for emacs 28
-(use-package undo-fu)
+(vertico-mode)
+(linum-relative-mode)
+(save-place-mode)
+(global-auto-revert-mode t)
 
-;;; Vim Bindings
-(use-package evil
-  :demand t
-  :bind (("<escape>" . keyboard-escape-quit))
-  :init
-  ;; allows for using cgn
-  ;; (setq evil-search-module 'evil-search)
-  (setq evil-want-keybinding nil)
-  ;; no vim insert bindings
-  (setq evil-undo-system 'undo-fu)
-  :config
-  (evil-mode 1))
+(blink-cursor-mode -1)
+(tool-bar-mode -1)
+(setq use-dialog-box nil)
+(global-auto-revert-mode 1)
+(tool-bar-mode 0)
+(scroll-bar-mode 0)
 
-;;; Vim Bindings Everywhere else
-(use-package evil-collection
-  :after evil
-  :config
-  (setq evil-want-integration t)
-  (evil-collection-init))
+(server-start)
+#+END_SRC
 
-
-
-
-
-
-
-#+END_SRC 
-#+RESULTS[2e8f35d0b930d397d02203d6dc4dc18c26177b0b]:
-: 4
+#+RESULTS[9d94676514ead4908f1ed94ec66b6f8b6fc6f0ba]:
 
 * global-setting
-** Backups, Autosaves, Locks
-Backup files I find to be more frustrating than not, so I disable them globally.
-The obvious risk here is that crashes cause files to be lost. 
-It's possible, of course, but I do find that frequent saving paired with good version control (and remote repos, syncing, and redundant copying) will suit me just fine.
-Then I never have weird file names cluttering up my folders.
-
-#+begin_src elisp
-(setq make-backup-files nil) ; stop creating backup~ files
-(setq auto-save-default nil) ; stop creating #autosave# files
-(setq create-lockfiles nil) ; no lockfiles
-
-#+end_src
-
-#+RESULTS[70c376fce4f9f608913ef0582c5d2f41539ad18f]:
-
 ** General Global Settings
-Changing a few things around to make emacs feel and act more like I want it to.
-The auto-revert setting is enabled because tangle / detangle for literate programming will change contents of files.
-If the file is open in a buffer, I want it to automatically show the change without asking me every time.
-
 #+BEGIN_SRC elisp
-    (global-set-key (kbd "C-s") 'save-buffer)
-    (global-set-key (kbd "C-S-s") 'write-file)
-    (global-auto-revert-mode t)
-    (tool-bar-mode 0)
-    (scroll-bar-mode 0)
-    (cua-mode 1)
-    ;; path stuff for macOS
-    (add-to-list 'exec-path "/usr/local/bin")
+(global-set-key (kbd "C-s") 'save-buffer)
+(global-set-key (kbd "C-S-s") 'write-file)
 
 #+END_SRC
 
-#+RESULTS[5ac3972033b408dc44acfce821d7009cdb63f7bc]:
-| /usr/local/sbin | /usr/local/bin | /usr/bin | /usr/lib/jvm/default/bin | /usr/bin/site_perl | /usr/bin/vendor_perl | /usr/bin/core_perl | /var/lib/snapd/snap/bin | /home/nls/tools/node-v14.15.4-linux-x64/bin | /home/nls/.local/bin | /home/nls/.bin | /usr/local/sbin | /usr/local/bin | /usr/bin | /usr/bin/site_perl | /usr/bin/vendor_perl | /usr/bin/core_perl | /var/lib/snapd/snap/bin | /home/nls/cpp/ | /home/nls/py/pytools | /home/nls/py/cnav | /home/nls/.fzf/bin | /home/nls/sys_cfg | /home/nls/py/lib | /usr/lib/emacs/27.2/x86_64-pc-linux-gnu |
-
-Set Up Good Defaults. Taken from [[https://github.com/angrybacon/dotemacs/blob/master/dotemacs.org#use-better-defaults][here]]
+#+RESULTS[edecfcd3a0a7998757ed9726bef480bb711ce2e1]:
 
 #+begin_src elisp
 ;; (set-frame-font "Menlo 15" nil t)
 (load-theme 'nord t)
 
 (setq-default
+ make-backup-files nil                            ; stop creating backup~ files
+ auto-save-default nil                            ; stop creating #autosave# files
+ create-lockfiles nil                             ; no lockfiles
  ad-redefinition-action 'accept                   ; Silence warnings for redefinition
  auto-window-vscroll nil                          ; Lighten vertical scroll
  confirm-kill-emacs 'yes-or-no-p                  ; Confirm before exiting Emacs
@@ -143,9 +156,7 @@ Set Up Good Defaults. Taken from [[https://github.com/angrybacon/dotemacs/blob/m
  display-time-format "%H:%M"                      ; Format the time string
  fill-column 80                                   ; Set width for automatic line breaks
  scroll-bar-mode nil
- display-line-numbers-type nil
  help-window-select t                             ; Focus new help windows when opened
- indent-tabs-mode nil                             ; Stop using tabs to indent
  inhibit-startup-screen t                         ; Disable start-up screen
  initial-scratch-message ""                       ; Empty the initial *scratch* buffer
  left-margin-width 1 right-margin-width 1         ; Add left and right margins
@@ -156,7 +167,7 @@ Set Up Good Defaults. Taken from [[https://github.com/angrybacon/dotemacs/blob/m
  show-trailing-whitespace nil                     ; Display trailing whitespaces
  split-height-threshold nil                       ; Disable vertical window splitting
  split-width-threshold 1                          ; Disable horizontal window splitting
- tab-width 4                                      ; Set width for tabs
+ tab-width 2                                      ; Set width for tabs
  uniquify-buffer-name-style 'forward              ; Uniquify buffer names
  window-combination-resize t                      ; Resize windows proportionally
  x-stretch-cursor t                               ; Stretch cursor to the glyph width
@@ -173,6 +184,9 @@ Set Up Good Defaults. Taken from [[https://github.com/angrybacon/dotemacs/blob/m
 
 #+end_src
 
+#+RESULTS[09a7f4927cc483991fa517d2aae1b57e5c2d2464]:
+: (utf-8-unix . utf-8-unix)
+
 Apparently Garbage Collecting when out of focus can make emacs feel faster. I'll try that.
 
 #+begin_src elisp
@@ -181,12 +195,8 @@ Apparently Garbage Collecting when out of focus can make emacs feel faster. I'll
 #+end_src
 
 #+RESULTS[fa1d73674c306882088317f09677e78c8fc2f746]:
-| garbage-collect |
 
-** custom
-#+BEGIN_SRC elisp
-(vertico-mode)
-#+END_SRC
+
 * dev-settings
 I mostly use Clojure and Clojurescript, so they're the envs I set up.
 
@@ -222,11 +232,17 @@ I don't use it so can't actually speak to its utility, but I know many clojure e
 
 #+END_SRC
 
+#+RESULTS[4a56a97b83f282cc484dcef0acb7ceeaf9032d1e]:
+| imenu-add-menubar-index | enable-paredit-mode | eldoc-mode | (lambda nil (show-paren-mode 1)) |
+
 ** Clojurescript
 #+BEGIN_SRC elisp
 (add-hook 'clojurescript-mode #'enable-paredit-mode)
 
 #+END_SRC
+
+#+RESULTS[541d1965d92ceb2633419253bdcc8f41206b80f0]:
+| enable-paredit-mode |
 
 * literate-programming
 Literate programming enables contextual, 'justified' programming.
@@ -243,17 +259,20 @@ org file. It's not for everyone, but the flow works for me.
 (require 'org)
 (add-to-list 'org-modules 'org-tempo)
 (setq org-startup-folded nil
-      org-hide-emphasis-markers nil
-      org-edit-src-content-indentation 0
-      org-src-tab-acts-natively t
-      org-src-fontify-natively t
-      org-confirm-babel-evaluate nil
-      org-support-shift-select 'always)
+		org-hide-emphasis-markers nil
+		org-edit-src-content-indentation 0
+		org-src-tab-acts-natively t
+		org-src-fontify-natively t
+		org-confirm-babel-evaluate nil
+		org-support-shift-select 'always)
 
 (add-hook 'org-mode-hook 'show-paren-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
 #+END_SRC
+
+#+RESULTS[3c028613cc44e0a9478bb50b34d20bc8e5b07932]:
+| org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 Trying to fix weird org syntax problems.
 This just lets Org ignore < and > characters as if they were regular words.
@@ -263,32 +282,38 @@ This caused any other paren matching to stop working. It sucked.
 ** angle-bracket-hack
 #+begin_src elisp
 (defun my-angle-bracket-fix ()
-  (modify-syntax-entry ?< "w")
-  (modify-syntax-entry ?> "w"))
+(modify-syntax-entry ?< "w")
+(modify-syntax-entry ?> "w"))
 
 (add-hook 'org-mode-hook 'my-angle-bracket-fix)
 #+end_src
 
+#+RESULTS[81ea85255476203ec4bc6e4413c022992c4c4b82]:
+| org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 ** paredit-in-code-block
 This block will activate paredit-mode when in an org-mode src file. Obvious weaknesses:
- - checks post-command, which occurs a lot. Could become a problem.
- - Does not check the block's language. Paredit may not be desireable in other langs.
- - does break if you have unbalenced parens anywhere in the org file. Don't yet have a solution for that.
+- checks post-command, which occurs a lot. Could become a problem.
+- Does not check the block's language. Paredit may not be desireable in other langs.
+- does break if you have unbalenced parens anywhere in the org file. Don't yet have a solution for that.
 
 Alternatively, poly-mode might be useful here. In my experiments though, it proved to be a bit too clunky for my tastes and it interfered with a few things like M-s splitting code blocks.
 
 #+begin_src elisp
 (defun my-paredit-in-code-block ()
-  (interactive)
-  (when (derived-mode-p 'org-mode)
-    (unless (window-minibuffer-p)
-      (if (org-babel-when-in-src-block)
-          (paredit-mode 1)
-        (paredit-mode 0)))))
+(interactive)
+(when (derived-mode-p 'org-mode)
+		(unless (window-minibuffer-p)
+		(if (org-babel-when-in-src-block)
+				(paredit-mode 1)
+				(paredit-mode 0)))))
 
 (add-hook 'post-command-hook #'my-paredit-in-code-block)
 
 #+end_src
+
+#+RESULTS[4bdf6ba4cd75ebd89bec11198ed53b6d69a3cd9b]:
+| my-paredit-in-code-block | global-font-lock-mode-check-buffers | global-eldoc-mode-check-buffers | evil-mode-check-buffers | global-evil-collection-unimpaired-mode-check-buffers | cua--post-command-handler | evil-repeat-post-hook |
 
 It's extremely useful to split code blocks to quickly add org-mode text between the src. The default binding is C-c C-v C-d, which is somewhat annoying. I think M-s in org-mode should do the trick.
 
@@ -301,13 +326,19 @@ It's extremely useful to split code blocks to quickly add org-mode text between 
 
 #+END_SRC
 
+#+RESULTS[62ac272893b0f83ef25306e4bb7ee0be6b1cc95e]:
+: paredit-mode
+
 Remove the function which causes text to pop around when pressing tab. This is annoying and confusing.
 
 #+BEGIN_SRC elisp
 (remove-hook 'org-cycle-hook
-             'org-optimize-window-after-visibility-change)
+						'org-optimize-window-after-visibility-change)
 
 #+END_SRC
+
+#+RESULTS[e058c0014c2b5c5f302ab0c172dbf6c9ae60229f]:
+| org-cycle-hide-archived-subtrees | org-cycle-hide-drawers | org-cycle-show-empty-lines |
 
 ** org-babel-settings
 Org Babel is used for evaluating code blocks inside org files.
@@ -315,23 +346,27 @@ We set some languages to load in for possible evaluation.
 
 #+BEGIN_SRC elisp
 (eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((clojure . t)
-     (clojurescript . t)
-     (emacs-lisp . t)
-     (shell . t))))
+(org-babel-do-load-languages
+'org-babel-load-languages
+'((clojure . t)
+		(clojurescript . t)
+		(emacs-lisp . t)
+		(shell . t))))
 
 #+END_SRC
+
+#+RESULTS[d3dc2ecff98215ec31b68d4ac2c23a6b989d6c88]:
 
 ** codeblock-backends
 Some backends for code execution need to be set.
 
 #+BEGIN_SRC elisp
 (setq org-babel-clojure-backend 'cider
-      org-babel-clojure-sync-nrepl-timeout nil)
+		org-babel-clojure-sync-nrepl-timeout nil)
 
 #+END_SRC
+
+#+RESULTS[6db4decaf42eaafa8356745345a3c32fefc3b3ba]:
 
 The clojure babel backend is nice, except it injects a namespace form at the top of every tangled code block. I don't know why, but I don't need that. To fix the issue, redefine the expand-body function from ob-clojure eliminating the ns string.
 
@@ -339,57 +374,62 @@ I don't know if this is still necessary. Maybe test without it?
 
 #+begin_src elisp
 (defun org-babel-expand-body:clojure (body params)
-  "Expand BODY according to PARAMS, return the expanded body."
-  (let* ((vars (org-babel--get-vars params))
-         (ns (or (cdr (assq :ns params))
-                 (org-babel-clojure-cider-current-ns)))
-         (result-params (cdr (assq :result-params params)))
-         (print-level nil)
-         (print-length nil)
-         (body
-          (org-trim
-           (format "%s"
-                   ;; Variables binding.
-                   (if (null vars) (org-trim body)
-                     (format "(let [%s]\n%s)"
-                             (mapconcat
-                              (lambda (var)
-                                (format "%S (quote %S)" (car var) (cdr var)))
-                              vars
-                              "\n      ")
-                             body))))))
-    (if (or (member "code" result-params)
-            (member "pp" result-params))
-        (format "(clojure.pprint/pprint (do %s))" body)
-      body)))
+"Expand BODY according to PARAMS, return the expanded body."
+(let* ((vars (org-babel--get-vars params))
+				(ns (or (cdr (assq :ns params))
+								(org-babel-clojure-cider-current-ns)))
+				(result-params (cdr (assq :result-params params)))
+				(print-level nil)
+				(print-length nil)
+				(body
+				(org-trim
+				(format "%s"
+								;; Variables binding.
+								(if (null vars) (org-trim body)
+										(format "(let [%s]\n%s)"
+														(mapconcat
+														(lambda (var)
+																(format "%S (quote %S)" (car var) (cdr var)))
+														vars
+														"\n      ")
+														body))))))
+		(if (or (member "code" result-params)
+						(member "pp" result-params))
+				(format "(clojure.pprint/pprint (do %s))" body)
+		body)))
 
 #+end_src
+
+#+RESULTS[7188edeff9773e5b3c4792bce8987dd2785f04c4]:
+: org-babel-expand-body:clojure
 
 Add the ability to evaluate code blocks in Org files in the proper REPL window.
 
 #+begin_src elisp
 ;; Sets M-<return> to evaluate code blocks in the REPL
 (defun org-meta-return-around (org-fun &rest args)
-  "Run `ober-eval-in-repl' if in source code block,
-  `ober-eval-block-in-repl' if at header,
-  and `org-meta-return' otherwise."
-    (if (org-in-block-p '("src"))
-        (let* ((point (point))
-               (element (org-element-at-point))
-               (area (org-src--contents-area element))
-               (beg (copy-marker (nth 0 area))))
-          (if (< point beg)
-              (ober-eval-block-in-repl)
-            (ober-eval-in-repl)))
-      (apply org-fun args)))
+"Run `ober-eval-in-repl' if in source code block,
+`ober-eval-block-in-repl' if at header,
+and `org-meta-return' otherwise."
+		(if (org-in-block-p '("src"))
+				(let* ((point (point))
+						(element (org-element-at-point))
+						(area (org-src--contents-area element))
+						(beg (copy-marker (nth 0 area))))
+				(if (< point beg)
+						(ober-eval-block-in-repl)
+						(ober-eval-in-repl)))
+		(apply org-fun args)))
 
 (advice-add 'org-meta-return :around #'org-meta-return-around)
 
 ;; Prevent eval in repl from moving cursor to the REPL
 (with-eval-after-load "eval-in-repl"
-  (setq eir-jump-after-eval nil))
+(setq eir-jump-after-eval nil))
 
 #+end_src
+
+#+RESULTS[a2f28b41d99fe9e235007e2ea76c5c16e71770cc]:
 
 ** literate-programming-util-fns
 Tangling can be set to occur automatically on save. This makes things way simpler.
@@ -401,39 +441,45 @@ Tangle on save only occurs if the buffer being saved is an Org-Mode file.
 (defun org-babel-clojure-cider-current-ns ())
 
 (defun tangle-on-save-org-mode-file ()
-  (when (and (string-match-p
-              (regexp-quote ".org") (message "%s" (current-buffer)))
-             (not (string-match-p
-                   (regexp-quote "[") (message "%s" (current-buffer)))))
-    (org-babel-tangle)))
+(when (and (string-match-p
+						(regexp-quote ".org") (message "%s" (current-buffer)))
+						(not (string-match-p
+								(regexp-quote "[") (message "%s" (current-buffer)))))
+		(org-babel-tangle)))
 
 (add-hook 'after-save-hook 'tangle-on-save-org-mode-file)
 
 (defun to-agenda-on-save-org-mode-file ()
-  (when (string= (message "%s" major-mode) "org-mode")
-    (org-agenda-file-to-front)))
+(when (string= (message "%s" major-mode) "org-mode")
+		(org-agenda-file-to-front)))
 
 (add-hook 'after-save-hook 'to-agenda-on-save-org-mode-file)
 
 #+END_SRC
+
+#+RESULTS[7b0d312d6dcec4697db75492730f53ca500af468]:
+| rmail-after-save-hook | revert-all-buffers | to-agenda-on-save-org-mode-file | tangle-on-save-org-mode-file |
 
 ** buffer-revert
 When a file is modified externally, emacs does not show this change by default. Instead, when you try to edit it will ask you to modify or revert. Since Tangling files changes src code automatically, it is more effective to automatically revert any buffers which have src files open. 
 
 #+BEGIN_SRC elisp
 (defun revert-all-buffers ()
-  "Refreshes all open buffers from their respective files."
-  (interactive)
-  (dolist (buf (buffer-list))
-    (with-current-buffer buf
-      (when (and (buffer-file-name)
-		 (file-exists-p (buffer-file-name))
-		 (not (buffer-modified-p)))
-	(revert-buffer t t t) )))
-  (message "Refreshed open files."))
+"Refreshes all open buffers from their respective files."
+(interactive)
+(dolist (buf (buffer-list))
+		(with-current-buffer buf
+		(when (and (buffer-file-name)
+		(file-exists-p (buffer-file-name))
+		(not (buffer-modified-p)))
+(revert-buffer t t t) )))
+(message "Refreshed open files."))
 (add-hook 'after-save-hook 'revert-all-buffers)
 
 #+END_SRC
+
+#+RESULTS[41b61b454119aeb5404dd37abf3ab74b17cca696]:
+| rmail-after-save-hook | revert-all-buffers | to-agenda-on-save-org-mode-file | tangle-on-save-org-mode-file |
 
 ** faster tangling
 The following code is from:
@@ -445,19 +491,23 @@ It basically boils down to adjusting garbage collection settings at key times du
 #+BEGIN_SRC elisp
 (setq help/default-gc-cons-threshold gc-cons-threshold)
 (defun help/set-gc-cons-threshold (&optional multiplier notify)
-  "Set `gc-cons-threshold' either to its default value or a
-   `multiplier' thereof."
-  (let* ((new-multiplier (or multiplier 1))
-         (new-threshold (* help/default-gc-cons-threshold
-                           new-multiplier)))
-    (setq gc-cons-threshold new-threshold)
-    (when notify (message "Setting `gc-cons-threshold' to %s"
-                          new-threshold))))
+"Set `gc-cons-threshold' either to its default value or a
+`multiplier' thereof."
+(let* ((new-multiplier (or multiplier 1))
+				(new-threshold (* help/default-gc-cons-threshold
+												new-multiplier)))
+		(setq gc-cons-threshold new-threshold)
+		(when notify (message "Setting `gc-cons-threshold' to %s"
+												new-threshold))))
 (defun help/double-gc-cons-threshold () "Double `gc-cons-threshold'." (help/set-gc-cons-threshold 2))
 (add-hook 'org-babel-pre-tangle-hook #'help/double-gc-cons-threshold)
 (add-hook 'org-babel-post-tangle-hook #'help/set-gc-cons-threshold)
 
 #+END_SRC
+
+#+RESULTS[aefd889b4f9cdc48d8afacc57fd610ed13d892dc]:
+| help/set-gc-cons-threshold |
+
 
 * templates
 Insertion templates can be used to speed up project setups. This is code of my own creation, so use at your own risk. The template files are in ~.emacs.d/templates/lib.org~.
@@ -465,45 +515,55 @@ Insertion templates can be used to speed up project setups. This is code of my o
 ** slurp
 #+BEGIN_SRC elisp
 (defun slurp (file)
-  (with-temp-buffer
-    (insert-file-contents file)
-    (buffer-substring-no-properties
-     (point-min)
-     (point-max))))
+(with-temp-buffer
+		(insert-file-contents file)
+		(buffer-substring-no-properties
+		(point-min)
+		(point-max))))
 
 #+END_SRC
+
+#+RESULTS[2e3060138a8b14c400b142d70c2bb4e117abba87]:
+: slurp
 
 ** template-reader
 #+begin_src elisp
 (defun template-reader (file replace)
-  (let ((lines (split-string (slurp file) "\n")))
-    (->> lines
-         (mapcar (lambda (x) (replace-regexp-in-string "_str_" replace x)))
-         (mapcar (lambda (x) (concat x "\n")))
-         (-concat)
-         (apply 'concat))))
+(let ((lines (split-string (slurp file) "\n")))
+		(->> lines
+				(mapcar (lambda (x) (replace-regexp-in-string "_str_" replace x)))
+				(mapcar (lambda (x) (concat x "\n")))
+				(-concat)
+				(apply 'concat))))
 
 #+end_src
+
+#+RESULTS[e710e2536712b6767ffb2e64321dd28e53ef38d6]:
+: template-reader
 
 ** clj-org-templates
 I use org mode and literate programming ideas to build my clj/cljs projects. So, it is helpful to have skeletons that take .org template files that tangle into a nice clojure project setup. Currently I only have one template, but the idea is to be able to have a few which you just bind to different keys as needed. The idea is demonstrated with 'Project' and 'Library'.
 
 #+BEGIN_SRC elisp
 (define-skeleton cljc-lib-skeleton
-  "Inserts a .org template with user's project name input. 
-   Use in empty file and save to desired project directory.
-   Tangle will create project structure on save."
-  ""
-  (template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Library name: ")))
+"Inserts a .org template with user's project name input. 
+Use in empty file and save to desired project directory.
+Tangle will create project structure on save."
+""
+(template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Library name: ")))
 
 (define-skeleton cljc-project-skeleton
-  "Inserts a .org template with user's project name input. 
-   Use in empty file and save to desired project directory.
-   Tangle will create project structure on save."
-  ""
-  (template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Project name: ")))
+"Inserts a .org template with user's project name input. 
+Use in empty file and save to desired project directory.
+Tangle will create project structure on save."
+""
+(template-reader "~/.emacs.d/templates/lib.org" (skeleton-read "Project name: ")))
 
 (global-set-key (kbd "C-S-L") 'cljc-lib-skeleton)
 (global-set-key (kbd "C-S-P") 'cljc-project-skeleton)
 
 #+END_SRC
+
+#+RESULTS[ac7008ff41880d32cebc3f948c385939eefb86c7]:
+: cljc-project-skeleton
+
