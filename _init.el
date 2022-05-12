@@ -6,6 +6,7 @@
 		clojure-mode
 		nord-theme
 		async
+    ob-hy
 		ob-async
 		ob-clojurescript
 		org-babel-eval-in-repl
@@ -29,6 +30,12 @@
 (eval-when-compile (require 'use-package))
 (use-package undo-fu) ;; Vim style undo not needed for emacs 28
 
+(defun org-open-current-frame ()
+	"Opens file in current frame."
+	(interactive)
+	(let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
+		(org-open-at-point)))
+
 (global-evil-leader-mode 1)
 (evil-leader/set-leader "<SPC>")
 
@@ -37,6 +44,9 @@
 	"j" 'evil-window-down
 	"k" 'evil-window-up
 	"l" 'evil-window-right
+
+	"s" 'evil-split-buffer
+	"v" 'evil-window-vsplit
 
 	"q" 'evil-window-delete
 	"f" 'find-file
@@ -53,7 +63,8 @@
 	"d" 'kill-buffer)
 
 
-(define-key evil-normal-state-map (kbd "U") 'evil-redo)
+(define-key evil-normal-state-map (kbd "<RET>") 'org-open-current-frame)
+(define-key evil-normal-state-map (kbd "U") 'undo-fu-only-redo)
 (define-key evil-normal-state-map (kbd "J") 'scroll-up-line)
 (define-key evil-normal-state-map (kbd "K") 'scroll-down-line)
 
@@ -75,9 +86,11 @@
 	(setq evil-want-integration t)
 	(evil-collection-init))
 (vertico-mode)
+(global-linum-mode)
 (linum-relative-mode)
 (save-place-mode)
 (global-auto-revert-mode t)
+(global-company-mode)
 
 (blink-cursor-mode -1)
 (tool-bar-mode -1)
@@ -164,6 +177,7 @@
 
 (add-hook 'org-mode-hook 'show-paren-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+(org-agenda-files  "~/base.org")
 (defun my-angle-bracket-fix ()
 (modify-syntax-entry ?< "w")
 (modify-syntax-entry ?> "w"))
@@ -189,9 +203,11 @@
 (org-babel-do-load-languages
 'org-babel-load-languages
 '((clojure . t)
-		(clojurescript . t)
-		(emacs-lisp . t)
-		(shell . t))))
+	(clojurescript . t)
+	(emacs-lisp . t)
+	(shell . t)
+	(hy . t)
+  (python . t))))
 (setq org-babel-clojure-backend 'cider
 		org-babel-clojure-sync-nrepl-timeout nil)
 (defun org-babel-expand-body:clojure (body params)
@@ -307,3 +323,18 @@ Tangle will create project structure on save."
 
 (global-set-key (kbd "C-S-L") 'cljc-lib-skeleton)
 (global-set-key (kbd "C-S-P") 'cljc-project-skeleton)
+(find-file "~/base.org")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-agenda-files '("~/base.org" "~/.emacs.d/init.org" "~/.notes"))
+ '(package-selected-packages
+	 '(exwm vertico use-package undo-fu solarized-theme org-babel-eval-in-repl ob-hy ob-clojurescript ob-async nord-theme monokai-theme linum-relative jsonrpc hy-mode gruvbox-theme flymake evil-leader evil-collection company cider-hydra cider-eval-sexp-fu cider-decompile)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

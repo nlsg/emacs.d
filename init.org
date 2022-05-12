@@ -3,7 +3,6 @@
 #+STARTUP: overview
 #+PROPERTY: header-args :cache yes :tangle ~/.emacs.d/init.el :mkdirp yes :padline no :async
 
-
 * MELPA / pkgs
 [[https://melpa.org/#/getting-started][MELPA]], the defacto standard package manager for emacs
 
@@ -23,6 +22,7 @@
 		clojure-mode
 		nord-theme
 		async
+    ob-hy
 		ob-async
 		ob-clojurescript
 		org-babel-eval-in-repl
@@ -41,7 +41,7 @@
 		(package-install package)))
 
 #+END_SRC
-#+RESULTS[bd778cd04e227fee06eec20623a92be1b73072dd]:
+#+RESULTS[672fcb4197350e40b7e676026f5683f50e2f79bd]:
 
 ** bootstrap use-package
 #+BEGIN_SRC elisp
@@ -52,71 +52,83 @@
 (eval-when-compile (require 'use-package))
 #+END_SRC
 
-#+RESULTS[892ddbca7d1f646a522d1f6d6e5674ec11c7d720]:
+#+RESULTS[ad86c96e0de1cf7497b617af0d40662cca1c2aff]:
 : use-package
 
 
 * evil
     #+BEGIN_SRC elisp
-		(use-package undo-fu) ;; Vim style undo not needed for emacs 28
+				(use-package undo-fu) ;; Vim style undo not needed for emacs 28
 
-		(global-evil-leader-mode 1)
-		(evil-leader/set-leader "<SPC>")
+				(defun org-open-current-frame ()
+					"Opens file in current frame."
+					(interactive)
+					(let ((org-link-frame-setup (cons (cons 'file 'find-file) org-link-frame-setup)))
+						(org-open-at-point)))
 
-		(evil-leader/set-key
-			"h" 'evil-window-left
-			"j" 'evil-window-down
-			"k" 'evil-window-up
-			"l" 'evil-window-right
+				(global-evil-leader-mode 1)
+				(evil-leader/set-leader "<SPC>")
 
-			"q" 'evil-window-delete
-			"f" 'find-file
-			"<SPC>" 'execute-extended-command
-			"<RET>" 'org-open-at-point
+				(evil-leader/set-key
+					"h" 'evil-window-left
+					"j" 'evil-window-down
+					"k" 'evil-window-up
+					"l" 'evil-window-right
 
-			"H" 'evil-window-move-far-left
-			"J" 'evil-window-move-very-bottom
-			"K" 'evil-window-move-very-top
-			"L" 'evil-window-move-far-right
+					"s" 'evil-split-buffer
+					"v" 'evil-window-vsplit
 
-			"w" 'save-buffer
-			"b" 'switch-to-buffer
-			"d" 'kill-buffer)
+					"q" 'evil-window-delete
+					"f" 'find-file
+					"<SPC>" 'execute-extended-command
+					"<RET>" 'org-open-at-point
+
+					"H" 'evil-window-move-far-left
+					"J" 'evil-window-move-very-bottom
+					"K" 'evil-window-move-very-top
+					"L" 'evil-window-move-far-right
+
+					"w" 'save-buffer
+					"b" 'switch-to-buffer
+					"d" 'kill-buffer)
 
 
-		(define-key evil-normal-state-map (kbd "U") 'evil-redo)
-		(define-key evil-normal-state-map (kbd "J") 'scroll-up-line)
-		(define-key evil-normal-state-map (kbd "K") 'scroll-down-line)
+				(define-key evil-normal-state-map (kbd "<RET>") 'org-open-current-frame)
+				(define-key evil-normal-state-map (kbd "U") 'undo-fu-only-redo)
+				(define-key evil-normal-state-map (kbd "J") 'scroll-up-line)
+				(define-key evil-normal-state-map (kbd "K") 'scroll-down-line)
 
-		(use-package evil
-			:demand t
-			:bind (("<escape>" . keyboard-escape-quit))
-			:init
-			(setq evil-wantintegration t
-				evil-search-module 'evil-search
-				evil-want-keybinding nil
-				evil-undo-system 'undo-fu)
-			:config
-			(evil-mode 1))
+				(use-package evil
+					:demand t
+					:bind (("<escape>" . keyboard-escape-quit))
+					:init
+					(setq evil-wantintegration t
+						evil-search-module 'evil-search
+						evil-want-keybinding nil
+						evil-undo-system 'undo-fu)
+					:config
+					(evil-mode 1))
 
-		;;; Vim Bindings Everywhere else
-		(use-package evil-collection
-			:after evil
-			:config
-			(setq evil-want-integration t)
-			(evil-collection-init))
+				;;; Vim Bindings Everywhere else
+				(use-package evil-collection
+					:after evil
+					:config
+					(setq evil-want-integration t)
+					(evil-collection-init))
 
     #+END_SRC 
-		#+RESULTS[4a2d18a086afe108bcadf6c58f94f08a87354d2c]:
+		#+RESULTS[fe9017a79c15639e9e76e7525e646dc7dbaa7877]:
 		: t
 
 
 * set-modes
 #+BEGIN_SRC elisp
 (vertico-mode)
+(global-linum-mode)
 (linum-relative-mode)
 (save-place-mode)
 (global-auto-revert-mode t)
+(global-company-mode)
 
 (blink-cursor-mode -1)
 (tool-bar-mode -1)
@@ -128,7 +140,7 @@
 (server-start)
 #+END_SRC
 
-#+RESULTS[9d94676514ead4908f1ed94ec66b6f8b6fc6f0ba]:
+#+RESULTS[f8e15f45c1dc0b3bfa9a01c7749ac113630cf58b]:
 
 * global-setting
 ** General Global Settings
@@ -138,7 +150,8 @@
 
 #+END_SRC
 
-#+RESULTS[edecfcd3a0a7998757ed9726bef480bb711ce2e1]:
+#+RESULTS[1edac9fc53ffb7b1818c3a4547e459d4ea93926f]:
+: write-file
 
 #+begin_src elisp
 ;; (set-frame-font "Menlo 15" nil t)
@@ -244,6 +257,7 @@ I don't use it so can't actually speak to its utility, but I know many clojure e
 #+RESULTS[541d1965d92ceb2633419253bdcc8f41206b80f0]:
 | enable-paredit-mode |
 
+
 * literate-programming
 Literate programming enables contextual, 'justified' programming.
 It encourages programmers to write the /why/ of their programming decisions while simultaneously writing the code.
@@ -268,11 +282,12 @@ org file. It's not for everyone, but the flow works for me.
 
 (add-hook 'org-mode-hook 'show-paren-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+(org-agenda-files  "~/base.org")
 
 #+END_SRC
 
-#+RESULTS[3c028613cc44e0a9478bb50b34d20bc8e5b07932]:
-| org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+#+RESULTS[9213e41f589c2f2d11ab2c208c0cb0dd89f58877]:
+| ~/base.org | ~/.notes |
 
 Trying to fix weird org syntax problems.
 This just lets Org ignore < and > characters as if they were regular words.
@@ -288,7 +303,7 @@ This caused any other paren matching to stop working. It sucked.
 (add-hook 'org-mode-hook 'my-angle-bracket-fix)
 #+end_src
 
-#+RESULTS[81ea85255476203ec4bc6e4413c022992c4c4b82]:
+#+RESULTS[b8fdc3432bc8c574b68d338ae540646e4e545e9c]:
 | org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 ** paredit-in-code-block
@@ -312,8 +327,8 @@ Alternatively, poly-mode might be useful here. In my experiments though, it prov
 
 #+end_src
 
-#+RESULTS[4bdf6ba4cd75ebd89bec11198ed53b6d69a3cd9b]:
-| my-paredit-in-code-block | global-font-lock-mode-check-buffers | global-eldoc-mode-check-buffers | evil-mode-check-buffers | global-evil-collection-unimpaired-mode-check-buffers | cua--post-command-handler | evil-repeat-post-hook |
+#+RESULTS[609db0c6ce35d36a696fc493189300caaab5120c]:
+| global-font-lock-mode-check-buffers | global-eldoc-mode-check-buffers | evil-mode-check-buffers | global-evil-collection-unimpaired-mode-check-buffers | global-linum-mode-check-buffers | my-paredit-in-code-block | evil-repeat-post-hook |
 
 It's extremely useful to split code blocks to quickly add org-mode text between the src. The default binding is C-c C-v C-d, which is somewhat annoying. I think M-s in org-mode should do the trick.
 
@@ -337,7 +352,7 @@ Remove the function which causes text to pop around when pressing tab. This is a
 
 #+END_SRC
 
-#+RESULTS[e058c0014c2b5c5f302ab0c172dbf6c9ae60229f]:
+#+RESULTS[740cc9533bdd3392969242e3bba36182b5d385a5]:
 | org-cycle-hide-archived-subtrees | org-cycle-hide-drawers | org-cycle-show-empty-lines |
 
 ** org-babel-settings
@@ -349,13 +364,15 @@ We set some languages to load in for possible evaluation.
 (org-babel-do-load-languages
 'org-babel-load-languages
 '((clojure . t)
-		(clojurescript . t)
-		(emacs-lisp . t)
-		(shell . t))))
+	(clojurescript . t)
+	(emacs-lisp . t)
+	(shell . t)
+	(hy . t)
+  (python . t))))
 
 #+END_SRC
 
-#+RESULTS[d3dc2ecff98215ec31b68d4ac2c23a6b989d6c88]:
+#+RESULTS[1b083b426d48395e59a816749eef81e2e7359ee3]:
 
 ** codeblock-backends
 Some backends for code execution need to be set.
@@ -366,7 +383,7 @@ Some backends for code execution need to be set.
 
 #+END_SRC
 
-#+RESULTS[6db4decaf42eaafa8356745345a3c32fefc3b3ba]:
+#+RESULTS[49bfcddf683ecc234aba0b85286c9540359e875e]:
 
 The clojure babel backend is nice, except it injects a namespace form at the top of every tangled code block. I don't know why, but I don't need that. To fix the issue, redefine the expand-body function from ob-clojure eliminating the ns string.
 
@@ -400,7 +417,7 @@ I don't know if this is still necessary. Maybe test without it?
 
 #+end_src
 
-#+RESULTS[7188edeff9773e5b3c4792bce8987dd2785f04c4]:
+#+RESULTS[6bdf391eb7456d88e73ad03be401cfcb1564d49b]:
 : org-babel-expand-body:clojure
 
 Add the ability to evaluate code blocks in Org files in the proper REPL window.
@@ -429,7 +446,7 @@ and `org-meta-return' otherwise."
 
 #+end_src
 
-#+RESULTS[a2f28b41d99fe9e235007e2ea76c5c16e71770cc]:
+#+RESULTS[49bac1bf922ddb8333b4672be9d432d3e77ebd29]:
 
 ** literate-programming-util-fns
 Tangling can be set to occur automatically on save. This makes things way simpler.
@@ -457,7 +474,7 @@ Tangle on save only occurs if the buffer being saved is an Org-Mode file.
 
 #+END_SRC
 
-#+RESULTS[7b0d312d6dcec4697db75492730f53ca500af468]:
+#+RESULTS[c97625fc20bf7db638cb5538c2bedff6816c4760]:
 | rmail-after-save-hook | revert-all-buffers | to-agenda-on-save-org-mode-file | tangle-on-save-org-mode-file |
 
 ** buffer-revert
@@ -478,7 +495,7 @@ When a file is modified externally, emacs does not show this change by default. 
 
 #+END_SRC
 
-#+RESULTS[41b61b454119aeb5404dd37abf3ab74b17cca696]:
+#+RESULTS[ecdafcf82f9d317f0b5749139d36bbdf0f139abc]:
 | rmail-after-save-hook | revert-all-buffers | to-agenda-on-save-org-mode-file | tangle-on-save-org-mode-file |
 
 ** faster tangling
@@ -505,7 +522,7 @@ It basically boils down to adjusting garbage collection settings at key times du
 
 #+END_SRC
 
-#+RESULTS[aefd889b4f9cdc48d8afacc57fd610ed13d892dc]:
+#+RESULTS[3d8cb1922953013de0048ae96dd167ff337183d9]:
 | help/set-gc-cons-threshold |
 
 
@@ -523,7 +540,7 @@ Insertion templates can be used to speed up project setups. This is code of my o
 
 #+END_SRC
 
-#+RESULTS[2e3060138a8b14c400b142d70c2bb4e117abba87]:
+#+RESULTS[d1aba09135420de26ea980d108ce3482be4ce22f]:
 : slurp
 
 ** template-reader
@@ -538,7 +555,7 @@ Insertion templates can be used to speed up project setups. This is code of my o
 
 #+end_src
 
-#+RESULTS[e710e2536712b6767ffb2e64321dd28e53ef38d6]:
+#+RESULTS[93a81b4b742a35dde117efbe11e4678ff426e542]:
 : template-reader
 
 ** clj-org-templates
@@ -564,6 +581,12 @@ Tangle will create project structure on save."
 
 #+END_SRC
 
-#+RESULTS[ac7008ff41880d32cebc3f948c385939eefb86c7]:
+#+RESULTS[7620f03754fb6a37044ac15456f930b6f566fd27]:
 : cljc-project-skeleton
 
+
+
+* startup
+	#+begin_src elisp
+	(find-file "~/base.org")
+	#+end_src

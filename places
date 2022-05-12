@@ -1,5 +1,15 @@
 ;;; -*- coding: utf-8 -*-
-(("/home/nls/clj/ndb/"
+(("/home/nls/.emacs.d/init.org" . 20567)
+ ("/home/nls/.notes" . 9)
+ ("/home/nls/base.org" . 527)
+ ("/home/nls/.emacs.d/bookmarks" . 235)
+ ("/home/nls/.emacs.d/init.el" . 5794)
+ ("/home/nls/hy/dailyprogrammer.hy" . 1088)
+ ("/home/nls/batd.ini" . 33)
+ ("/home/nls/.emacs.d/elpa/ob-hy-20180702.540/ob-hy-autoloads.el" . 689)
+ ("/home/nls/tmp.py" . 3412)
+ ("/home/nls/.emacs.d/push.ini" . 149)
+ ("/home/nls/clj/ndb/"
 	(dired-filename . "/home/nls/clj/ndb/src"))
  ("/home/nls/clj/ndb/src/"
 	(dired-filename . "/home/nls/clj/ndb/src/cljs"))
@@ -12,10 +22,6 @@
 	(dired-filename . "/home/nls/hy/dashboard/.."))
  ("/home/nls/hy/"
 	(dired-filename . "/home/nls/hy/hytry.hy"))
- ("/home/nls/hy/hytry.hy" . 1087)
- ("/home/nls/base.org" . 665)
- ("/home/nls/.emacs.d/init.org" . 7977)
- ("/home/nls/.emacs.d/init.el" . 5794)
  ("/home/nls/.emacs.d/elpa/jsonrpc-1.0.15/jsonrpc-autoloads.el" . 470)
  ("/home/nls/.emacs.d/elpa/flymake-1.2.2/flymake-autoloads.el" . 4126)
  ("/home/nls/.emacs.d/elpa/project-0.8.1/project-autoloads.el" . 9081)
@@ -58,7 +64,6 @@
  ("/home/nls/.emacs.d/elpa/evil-leader-20140606.1243/evil-leader.el" . 4584)
  ("/home/nls/clj/todo/src/clj/"
 	(dired-filename . "/home/nls/clj/todo/src/clj/todo"))
- ("/home/nls/.emacs.d/push.ini" . 111)
  ("/home/nls/clj/"
 	(dired-filename . "/home/nls/clj/tst.clj"))
  ("/home/nls/.emacs.d/elpa/clojure-mode-20220418.2015/clojure-mode.el" . 23967)
