@@ -282,12 +282,12 @@ org file. It's not for everyone, but the flow works for me.
 
 (add-hook 'org-mode-hook 'show-paren-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
-(org-agenda-files  "~/base.org")
+;; (org-agenda-files  "~/base.org")
 
 #+END_SRC
 
-#+RESULTS[9213e41f589c2f2d11ab2c208c0cb0dd89f58877]:
-| ~/base.org | ~/.notes |
+#+RESULTS[331bddb00c792e591a6a233a7249030406d3b8a4]:
+| ~/.emacs.d/init.org | ~/base.org | ~/.notes |
 
 Trying to fix weird org syntax problems.
 This just lets Org ignore < and > characters as if they were regular words.
@@ -305,6 +305,29 @@ This caused any other paren matching to stop working. It sucked.
 
 #+RESULTS[b8fdc3432bc8c574b68d338ae540646e4e545e9c]:
 | org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
+#+END_SRC
+
+#+RESULTS[331bddb00c792e591a6a233a7249030406d3b8a4]:
+| ~/.emacs.d/init.org | ~/base.org | ~/.notes |
+
+Trying to fix weird org syntax problems.
+This just lets Org ignore < and > characters as if they were regular words.
+This is necessary because in Clojure I want to make functions with -> in the name and Org was always insisting on pairing <>.
+This caused any other paren matching to stop working. It sucked.
+
+** angle-bracket-hack
+#+begin_src elisp
+(defun my-angle-bracket-fix ()
+(modify-syntax-entry ?< "w")
+(modify-syntax-entry ?> "w"))
+
+(add-hook 'org-mode-hook 'my-angle-bracket-fix)
+#+end_src
+
+#+RESULTS[b8fdc3432bc8c574b68d338ae540646e4e545e9c]:
+| org-tempo-setup | my-angle-bracket-fix | turn-on-visual-line-mode | show-paren-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 
 ** paredit-in-code-block
 This block will activate paredit-mode when in an org-mode src file. Obvious weaknesses:
@@ -450,9 +473,9 @@ and `org-meta-return' otherwise."
 
 ** literate-programming-util-fns
 Tangling can be set to occur automatically on save. This makes things way simpler.
-Additionally, we set up todos to be moved to the agenda on save. This is just to keep things organized if todos are added to project org files. Once again, this is a good feature that I underutilize due to... how I am as a person, I guess??
+Additionally, we set up todos to be moved to the 5352 3501 0110 3713agenda on save. This is just to keep things organized if todos are added to project org files. Once again, this is a good feature that I underutilize due to... how I am as a person, I guess??
 
-Tangle on save only occurs if the buffer being saved is an Org-Mode file.
+Tdsffdsdfsdfsdfangle on save only occurs if the buffer being saved is an Org-Mode file.
 
 #+BEGIN_SRC elisp
 (defun org-babel-clojure-cider-current-ns ())

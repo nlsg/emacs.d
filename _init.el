@@ -177,7 +177,12 @@
 
 (add-hook 'org-mode-hook 'show-paren-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
-(org-agenda-files  "~/base.org")
+;; (org-agenda-files  "~/base.org")
+(defun my-angle-bracket-fix ()
+(modify-syntax-entry ?< "w")
+(modify-syntax-entry ?> "w"))
+
+(add-hook 'org-mode-hook 'my-angle-bracket-fix)
 (defun my-angle-bracket-fix ()
 (modify-syntax-entry ?< "w")
 (modify-syntax-entry ?> "w"))
@@ -329,9 +334,11 @@ Tangle will create project structure on save."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files '("~/base.org" "~/.emacs.d/init.org" "~/.notes"))
+ '(custom-safe-themes
+	 '("37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" default))
+ '(org-agenda-files '("~/base.org" "~/.emacs.d/init.org" "/tmp/tmp.org"))
  '(package-selected-packages
-	 '(exwm vertico use-package undo-fu solarized-theme org-babel-eval-in-repl ob-hy ob-clojurescript ob-async nord-theme monokai-theme linum-relative jsonrpc hy-mode gruvbox-theme flymake evil-leader evil-collection company cider-hydra cider-eval-sexp-fu cider-decompile)))
+	 '(magit telega emms-player-mpv-jp-radios emms mpv vterm exwm-firefox-evil exwm xelb vertico use-package undo-fu solarized-theme org-babel-eval-in-repl ob-hy ob-clojurescript ob-async nord-theme monokai-theme linum-relative jsonrpc hy-mode gruvbox-theme flymake evil-leader evil-collection company cider-hydra cider-eval-sexp-fu cider-decompile)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
